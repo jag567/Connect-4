@@ -32,7 +32,7 @@ def c4_start():
 
 @app.route('/c4/start/<code>', methods=['GET', 'POST'])
 def c4_start_player(code):
-    db = MySQLdb.connect("jag567.mysql.pythonanywhere-services.com", "jag567", "JZ4gSfywfY3rBr", "jag567$c4")
+    db = MySQLdb.connect(DATABASE_CONNECTION, HOST_ACCOUNT, DATABASE_PW, DATABASE_NAME)
     password = request.form.get('password')
     curs = db.cursor()
     game_id = None
@@ -60,7 +60,7 @@ def c4_start_player(code):
         if code == 'O':
             move = game.select_move()
             row = game.make_move(move)
-            db = MySQLdb.connect("jag567.mysql.pythonanywhere-services.com", "jag567", "JZ4gSfywfY3rBr", "jag567$c4")
+            db = MySQLdb.connect(DATABASE_CONNECTION, HOST_ACCOUNT, DATABASE_PW, DATABASE_NAME)
             curs = db.cursor()
             try:
                 curs.execute('insert into board(game_id, row, col, player) values({}, {}, {}, "{}");'.format(game_id, row, move, opponent(code)))
@@ -80,7 +80,7 @@ def c4_start_player(code):
 
 @app.route('/c4/play/<game_id>/<player>')
 def c4_play(game_id, player):
-    db = MySQLdb.connect("jag567.mysql.pythonanywhere-services.com", "jag567", "JZ4gSfywfY3rBr", "jag567$c4")
+    db = MySQLdb.connect(DATABASE_CONNECTION, HOST_ACCOUNT, DATABASE_PW, DATABASE_NAME)
     try:
         game = Connect4.Connect4(db, game_id)
     except Exception as ex:
@@ -89,7 +89,6 @@ def c4_play(game_id, player):
     db.close()
     created = game.get_created()
     key = str(hash(str(game_id) + str(created)))
-    # print("Compare cookie for", game_id, created,"as", key, "to", request.cookies.get('c4'))
     for _ in range(4):
         cookie = request.cookies.get('c4')
         if cookie is not None:
@@ -122,7 +121,7 @@ def c4_play(game_id, player):
 
 @app.route('/c4/move/<game_id>/<player>/<move>')
 def c4_move(game_id, player, move):
-    db = MySQLdb.connect("jag567.mysql.pythonanywhere-services.com", "jag567", "JZ4gSfywfY3rBr", "jag567$c4")
+    db = MySQLdb.connect(DATABASE_CONNECTION, HOST_ACCOUNT, DATABASE_PW, DATABASE_NAME)
     try:
         game = Connect4.Connect4(db, game_id)
     except Exception as ex:
@@ -159,7 +158,7 @@ def c4_move(game_id, player, move):
             winner = '"' + winner + '"'
         else:
             winner = "NULL"
-        db = MySQLdb.connect("jag567.mysql.pythonanywhere-services.com", "jag567", "JZ4gSfywfY3rBr", "jag567$c4")
+        db = MySQLdb.connect(DATABASE_CONNECTION, HOST_ACCOUNT, DATABASE_PW, DATABASE_NAME)
         curs = db.cursor()
         try:
             curs.execute('insert into board(game_id, row, col, player) values({}, {}, {}, "{}");'.format(game_id, row, move, opponent(player)))
@@ -177,7 +176,7 @@ def c4_move(game_id, player, move):
 
 @app.route('/c4/join', methods=['GET', 'POST'])
 def c4_join():
-    db = MySQLdb.connect("jag567.mysql.pythonanywhere-services.com", "jag567", "JZ4gSfywfY3rBr", "jag567$c4")
+    db = MySQLdb.connect(DATABASE_CONNECTION, HOST_ACCOUNT, DATABASE_PW, DATABASE_NAME)
     curs = db.cursor()
     try:
         curs.execute('select game_id, player, player_name, count(*) from players  group by game_id having count(*) = 1;')
@@ -193,7 +192,7 @@ def c4_join():
 
 @app.route('/c4/join/<game_id>/<code>', methods=['GET', 'POST'])
 def c4_join_game(game_id, code):
-    db = MySQLdb.connect("jag567.mysql.pythonanywhere-services.com", "jag567", "JZ4gSfywfY3rBr", "jag567$c4")
+    db = MySQLdb.connect(DATABASE_CONNECTION, HOST_ACCOUNT, DATABASE_PW, DATABASE_NAME)
     joinpw = request.form.get('password')
     curs = db.cursor()
     try:
